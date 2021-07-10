@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-set "$(dirname "$0")"/X11.bin "${@}"
+set -- "$(dirname "$0")/X11.bin" "${@}"
 
 if [ -x ~/.x11run ]; then
 	exec ~/.x11run "${@}"

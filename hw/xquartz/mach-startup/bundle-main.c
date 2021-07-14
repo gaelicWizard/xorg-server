@@ -713,20 +713,9 @@ main(int argc, char **argv, char **envp)
 static int
 execute(const char *command)
 {
-    const char *newargv[4];
-    const char **p;
+	if ( runWithShell(command) == 0 )
+		_exit(0);
 
-    newargv[0] = pref_login_shell;
-    newargv[1] = "-c";
-    newargv[2] = command;
-    newargv[3] = NULL;
-
-    ErrorF("X11.app: Launching %s:\n", command);
-    for (p = newargv; *p; p++) {
-        ErrorF("\targv[%ld] = %s\n", (long int)(p - newargv), *p);
-    }
-
-    execvp(newargv[0], (char *const *)newargv);
     perror("X11.app: Couldn't exec.");
     return 1;
 }

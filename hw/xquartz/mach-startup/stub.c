@@ -280,6 +280,8 @@ main(int argc, char **argv, char **envp)
         }
     }
 
+    pid_t xinit = getppid(); /* Parent of the stub is always(?) xinit. */
+
     /* Get X11.app's pid */
     request_pid(mp, &x11app_pid);
 
@@ -351,7 +353,7 @@ main(int argc, char **argv, char **envp)
      */
     handler = signal(SIGUSR1, SIG_IGN);
     if (handler == SIG_IGN)
-        kill(getppid(), SIGUSR1);
+        kill(xinit, SIGUSR1);
     signal(SIGUSR1, handler);
 
     kr = start_x11_server(mp, newargv, argc, newenvp, envpc);

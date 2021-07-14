@@ -654,8 +654,7 @@ main(int argc, char **argv, char **envp)
      * thread handle it.
      */
     if (!listenOnly) {
-        pid_t child1, child2;
-        int status;
+        pid_t child1;
 
         pref_app_to_run = command_from_prefs("app_to_run", DEFAULT_CLIENT);
         assert(pref_app_to_run);
@@ -674,15 +673,7 @@ main(int argc, char **argv, char **envp)
             FatalError("fork() failed: %s\n", strerror(errno));
 
         case 0:                                     /* child1 */
-            child2 = fork();
-
-            switch (child2) {
                 int max_files;
-
-            case -1:                                    /* error */
-                FatalError("fork() failed: %s\n", strerror(errno));
-
-            case 0:                                     /* child2 */
                 /* close all open files except for standard streams */
                 max_files = sysconf(_SC_OPEN_MAX);
                 for (i = 3; i < max_files; i++)
@@ -693,14 +684,14 @@ main(int argc, char **argv, char **envp)
                 open("/dev/null", O_RDONLY);
 
                 return startup_trigger(argc, argv, envp);
-
-            default:                                    /* parent (child1) */
-                _exit(0);
-            }
             break;
 
         default:                                    /* parent */
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
+                                             0), ^ {
+            int status;
             waitpid(child1, &status, 0);
+                   });
         }
 
         free(pref_app_to_run);

@@ -53,6 +53,7 @@
 #include "launchd_fd.h"
 
 static char x11_path[PATH_MAX + 1];
+static FSRef x11_appRef;
 static pid_t x11app_pid = 0;
 aslclient aslc;
 
@@ -62,7 +63,7 @@ set_x11_path(void)
     CFURLRef appURL = NULL;
     OSStatus osstatus =
         LSFindApplicationForInfo(kLSUnknownCreator, CFSTR(
-                                     kX11AppBundleId), nil, nil, &appURL);
+                                     kX11AppBundleId), nil, &x11_appRef, &appURL);
 
     switch (osstatus) {
     case noErr:
@@ -244,8 +245,31 @@ main(int argc, char **argv, char **envp)
                 server_bootstrap_name);
         set_x11_path();
 
+		char *listenOnlyArg = "--listenonly";
+		CFStringRef silentLaunchArg =
+			CFStringCreateWithCString(NULL, listenOnlyArg, kCFStringEncodingUTF8);
+		CFStringRef args[] = { silentLaunchArg };
+		CFArrayRef passArgv =
+			CFArrayCreate(NULL, (const void**) args, 1, NULL);
+		LSApplicationParameters params = {	0, /* CFIndex version == 0 */
+											kLSLaunchDefaults, /* LSLaunchFlags flags */
+											&x11_appRef, /* FSRef application */
+											NULL, /* void* asyncLaunchRefCon*/
+											NULL, /* CFDictionaryRef environment */
+											passArgv, /* CFArrayRef arguments */
+											NULL /* AppleEvent* initialEvent */
+										};
+		asl_log(aslc, NULL, ASL_LEVEL_NOTICE,
+				"Xquartz: Starting X server: %s --listenonly",
+				x11_path);
+		OSStatus status = LSOpenApplication(&params, NULL);
+		if (status != noErr) {
+			asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: Unable to launch %s", strerror(status));
         /* This forking is ugly and will be cleaned up later */
         child = fork();
+		} else
+			child = 1;
+
         if (child == -1) {
             asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: Could not fork: %s",
                     strerror(
@@ -256,11 +280,11 @@ main(int argc, char **argv, char **envp)
         if (child == 0) {
             char *_argv[3];
             _argv[0] = x11_path;
-            _argv[1] = "--listenonly";
+            _argv[1] = listenOnlyArg;
             _argv[2] = NULL;
             asl_log(aslc, NULL, ASL_LEVEL_NOTICE,
-                    "Xquartz: Starting X server: %s --listenonly",
-                    x11_path);
+                    "Xquartz: Starting X server: %s %s",
+                    x11_path, listenOnlyArg);
             return execvp(x11_path, _argv);
         }
 

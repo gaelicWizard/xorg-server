@@ -209,15 +209,6 @@ main(int argc, char **argv, char **envp)
     free(asl_sender);
     free(asl_facility);
 
-    /* We don't have a mechanism in place to handle this interrupt driven
-     * server-start notification, so just send the signal now, so xinit doesn't
-     * time out waiting for it and will just poll for the server.
-     */
-    handler = signal(SIGUSR1, SIG_IGN);
-    if (handler == SIG_IGN)
-        kill(getppid(), SIGUSR1);
-    signal(SIGUSR1, handler);
-
     /* Pass on SIGs to X11.app */
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
@@ -267,6 +258,8 @@ main(int argc, char **argv, char **envp)
             return EXIT_FAILURE;
         }
     }
+
+    pid_t xinit = getppid(); /* Parent of the stub is always(?) xinit. */
 
     /* Get X11.app's pid */
     request_pid(mp, &x11app_pid);
@@ -325,6 +318,23 @@ main(int argc, char **argv, char **envp)
     for (i = 0; i < envpc; i++) {
         strlcpy(newenvp[i], envp[i], STRING_T_SIZE);
     }
+
+    handler = signal(SIGUSR1, SIG_IGN);
+    if (handler == SIG_IGN){
+        kr = send_ppid(mp,xinit);
+        if (kr != KERN_SUCCESS) {
+    /* We don't have a mechanism in place to handle this interrupt driven
+     * server-start notification, so just send the signal now, so xinit doesn't
+     * time out waiting for it and will just poll for the server.
+     */
+            kill(xinit, SIGUSR1);
+            signal(SIGUSR1, handler);
+
+            asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: send_ppid: %s",
+                    mach_error_string(kr));
+        }
+    }
+    
 
     kr = start_x11_server(mp, newargv, argc, newenvp, envpc);
 

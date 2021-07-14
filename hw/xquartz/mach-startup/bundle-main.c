@@ -364,6 +364,15 @@ do_request_pid(mach_port_t port, int *my_pid)
     return KERN_SUCCESS;
 }
 
+pid_t xinit_pid = 0;
+
+kern_return_t
+do_send_ppid(mach_port_t port, int stub_ppid)
+{
+    xinit_pid = stub_ppid;
+    return KERN_SUCCESS;
+}
+
 /*** Server Startup ***/
 kern_return_t
 do_start_x11_server(mach_port_t port, string_array_t argv,
@@ -400,6 +409,7 @@ do_start_x11_server(mach_port_t port, string_array_t argv,
     }
     _envp[envpCnt] = NULL;
 
+    /* in quartzStartup.c */
     if (server_main(argvCnt, _argv, _envp) == 0)
         return KERN_SUCCESS;
     else

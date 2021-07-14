@@ -673,6 +673,7 @@ OsVendorFatalError(const char *f, va_list args)
  * OsVendorInit
  *  Initialization of Darwin OS support.
  */
+extern pid_t xinit_pid;
 void
 OsVendorInit(void)
 {
@@ -697,6 +698,9 @@ OsVendorInit(void)
         free(lf);
 
         DarwinPrintBanner();
+
+        if(xinit_pid > 0) /* inform xinit we are ready to accept clients */
+            kill(xinit_pid, SIGUSR1);
     }
 }
 

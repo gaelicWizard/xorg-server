@@ -132,6 +132,6 @@ server_main(int argc, char **argv, char **envp)
         }
     }
 
-    X11ControllerMain(argc, argv, envp);
+    X11ControllerMain(argc, argv, envp); // no return
     exit(0);
 }

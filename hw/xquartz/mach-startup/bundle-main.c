@@ -406,6 +406,8 @@ startup_trigger(int argc, char **argv, char **envp)
     const char *s;
 
     /* Take care of the case where we're called like a normal DDX */
+    // TODO: just exec the 'Xquartz' stub; don't duplicate here.
+    //    If there's some reason not to exec, then make a shared .c file
     if (argc > 1 && argv[1][0] == ':') {
         size_t i;
         kern_return_t kr;
@@ -476,10 +478,12 @@ startup_trigger(int argc, char **argv, char **envp)
         ErrorF(
             "X11.app: Could not connect to server (DISPLAY is not set).  Starting X server.\n");
     }
+    // TODO: submit an anonymous job to launchd so startx runs just like if the plist did
     return execute(pref_startx_script);
 }
 
 /** Setup the environment we want our child processes to inherit */
+// TODO: this goes in xinit or startx or whatever, not the X server!
 static void
 ensure_path(const char *dir)
 {
@@ -499,6 +503,7 @@ ensure_path(const char *dir)
     }
 }
 
+// TODO: this goes in xinit or startx or whatever, not the X server!
 static void
 setup_console_redirect(const char *bundle_id)
 {
@@ -523,6 +528,7 @@ setup_console_redirect(const char *bundle_id)
     asl_log_descriptor(aslc, NULL, ASL_LEVEL_NOTICE, STDERR_FILENO, ASL_LOG_DESCRIPTOR_WRITE);
 }
 
+// TODO: this goes in xinit or startx or whatever, not the X server!
 static void
 setup_env(void)
 {
@@ -629,7 +635,7 @@ main(int argc, char **argv, char **envp)
     /* Setup our environment for our children */
     setup_env();
 
-    /* The server must not run the PanoramiX operations. */
+    /* The server must not run the Xinerama (fka PanoramiX) operations. */
     noPanoramiXExtension = TRUE;
 
     /* Setup the initial crasherporter info */

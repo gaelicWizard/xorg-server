@@ -731,6 +731,34 @@ execute(const char *command)
     return 1;
 }
 
+static int
+runWithShell(const char *command)
+{
+    const char *newargv[4];
+    const char **p;
+    pid_t pid;
+    int status;
+
+    newargv[0] = pref_login_shell;
+    newargv[1] = "-c";
+    newargv[2] = command;
+    newargv[3] = NULL;
+
+    ErrorF("X11.app: Launching %s:\n", command);
+    for (p = newargv; *p; p++) {
+        ErrorF("\targv[%ld] = %s\n", (long int)(p - newargv), *p);
+    }
+
+	status = posix_spawn(&pid, newargv[0], NULL, NULL, (char *const *)newargv, environ);
+	if ( status == 0 )
+		dispatch_async(
+			dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+				waitpid(pid, NULL, 0);
+					});
+
+	return status;
+}
+
 static char *
 command_from_prefs(const char *key, const char *default_value)
 {

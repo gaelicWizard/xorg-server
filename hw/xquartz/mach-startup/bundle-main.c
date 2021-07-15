@@ -357,6 +357,13 @@ do_request_pid(mach_port_t port, int *my_pid)
     return KERN_SUCCESS;
 }
 
+kern_return_t
+do_request_ppid(mach_port_t port, int *my_ppid)
+{
+    *my_ppid = getppid();
+    return KERN_SUCCESS;
+}
+
 /*** Server Startup ***/
 kern_return_t
 do_start_x11_server(mach_port_t port, string_array_t argv,

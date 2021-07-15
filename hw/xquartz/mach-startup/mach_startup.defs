@@ -48,3 +48,7 @@ routine request_fd_handoff_socket (
 routine request_pid (
         port    : mach_port_t;
     out pid     : int);
+
+routine request_ppid (
+        port    : mach_port_t;
+    out pid     : int);

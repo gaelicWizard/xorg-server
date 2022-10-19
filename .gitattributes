@@ -1,0 +1,7 @@
+*.reg	text	eol=crlf
+xc/extras/Mesa/src/mesa/shader/slang/OSDependent/Windows/*	text	eol=crlf
+xc/extras/Mesa/windows/*	text	eol=crlf
+xc/extras/Mesa/windows/*/*/*/*	text	eol=crlf
+xc/extras/Mesa/windows/*/*/*	text	eol=crlf
+xc/extras/Mesa/windows/*/*	text	eol=crlf
+winconfig.h	text	eol=crlf

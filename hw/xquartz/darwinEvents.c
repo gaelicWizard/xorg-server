@@ -309,6 +309,7 @@ DarwinListenOnOpenFD(int fd)
     ErrorF("DarwinListenOnOpenFD: %d\n", fd);
 
     pthread_mutex_lock(&fd_add_lock);
+    NoListenAll = TRUE; /* disable default socket creation in DIX */
     if (fd_add_count < FD_ADD_MAX)
         fd_add[fd_add_count++] = fd;
     else

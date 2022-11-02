@@ -246,6 +246,12 @@ main(int argc, char **argv, char **envp)
         set_x11_path();
 
 		char *listenOnlyArg = "--listenonly";
+#if __OBJC__
+		[NSWorkspace 	 launchAppWithBundleIdentifier: x
+											   options: y
+						additionalEventParamDescriptor: z
+									  launchIdentifier:	_	]
+#else
 		CFStringRef silentLaunchArg =
 			CFStringCreateWithCString(NULL, listenOnlyArg, kCFStringEncodingUTF8);
 		CFStringRef args[] = { silentLaunchArg };
@@ -287,6 +293,7 @@ main(int argc, char **argv, char **envp)
                     x11_path, listenOnlyArg);
             return execvp(x11_path, _argv);
         }
+#endif /* __OBJC__ */
 
         /* Try connecting for 10 seconds */
         for (i = 0; i < 80; i++) {

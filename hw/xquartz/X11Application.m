@@ -825,7 +825,9 @@ xpbproxy_x_thread(void *args)
     return NULL;
 }
 
-void
+/* called from quartzStartup.c via X11ControllerMain() */
+//_X_NORETURN
+int
 X11ApplicationMain(int argc, char **argv, char **envp)
 {
 #ifdef DEBUG
@@ -849,6 +851,7 @@ X11ApplicationMain(int argc, char **argv, char **envp)
         /*
          * The xpr Quartz mode is statically linked into this server.
          * Initialize all the Quartz functions.
+         * Implemented in xprScreen.c
          */
         QuartzModeBundleInit();
 
@@ -874,6 +877,8 @@ X11ApplicationMain(int argc, char **argv, char **envp)
         }
 
         /* Tell the server thread that it can proceed */
+        /* this starts the X11 Server thread */
+        /* implemented in quartzStartup.c */
         QuartzInitServer(argc, argv, envp);
 
         /* This must be done after QuartzInitServer because it can result in
@@ -892,6 +897,7 @@ X11ApplicationMain(int argc, char **argv, char **envp)
 
     [NSApp run];
     /* not reached */
+    return KERN_SUCCESS;
 }
 
 @implementation X11Application (Private)

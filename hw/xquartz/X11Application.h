@@ -67,7 +67,8 @@ X11ApplicationLaunchClient(const char *cmd);
 Bool
 X11ApplicationCanEnterRandR(void);
 
-void
+//_X_NORETURN
+int
 X11ApplicationMain(int argc, char **argv, char **envp);
 
 extern Bool XQuartzScrollInDeviceDirection;

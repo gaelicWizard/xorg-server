@@ -117,7 +117,8 @@
 
 #endif /* __OBJC__ */
 
-void
+//_X_NORETURN
+int
 X11ControllerMain(int argc, char **argv, char **envp);
 
 #endif /* X11CONTROLLER_H */

@@ -916,8 +916,9 @@ extern char *bundle_id_prefix;
 
 @end
 
-void
+//_X_NORETURN
+int
 X11ControllerMain(int argc, char **argv, char **envp)
 {
-    X11ApplicationMain(argc, argv, envp); // no return
+    return X11ApplicationMain(argc, argv, envp); // no return
 }

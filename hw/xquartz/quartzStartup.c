@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include "X11Controller.h"
+#include "X11Application.h"
 #include "darwin.h"
 #include "darwinEvents.h"
 #include "quartz.h"
@@ -88,6 +89,8 @@ create_thread(void *func, void *arg)
     return tid;
 }
 
+/* Starts the X11 Server thread. */
+/* called from X11ApplicationMain() */
 void
 QuartzInitServer(int argc, char **argv, char **envp)
 {
@@ -113,6 +116,7 @@ QuartzInitServer(int argc, char **argv, char **envp)
     pthread_sigmask(SIG_BLOCK, &set, NULL);
 }
 
+/* called from bundle-main.c */
 int
 server_main(int argc, char **argv, char **envp)
 {
@@ -140,6 +144,5 @@ server_main(int argc, char **argv, char **envp)
         }
     }
 
-    X11ControllerMain(argc, argv, envp); // no return
-    exit(0);
+    return X11ApplicationMain(argc, argv, envp);
 }

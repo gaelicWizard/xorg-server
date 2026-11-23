@@ -60,9 +60,14 @@ _X_NORETURN
 static void
 server_thread(void *arg)
 {
-    struct arg args = *((struct arg *)arg);
+	struct arg args = *((struct arg *)arg);
+	int *result = malloc(sizeof(int));
+
     free(arg);
-    exit(dix_main(args.argc, args.argv, args.envp));
+
+	*result = dix_main(args.argc, args.argv, args.envp);
+
+	pthread_exit(result);
 }
 
 static pthread_t

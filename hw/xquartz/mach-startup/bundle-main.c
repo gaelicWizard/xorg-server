@@ -45,6 +45,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <pwd.h>
+#include <spawn.h>
 
 #include <dispatch/dispatch.h>
 
@@ -112,6 +114,8 @@ static int
 execute(const char *command);
 static char *
 command_from_prefs(const char *key, const char *default_value);
+static int
+runWithShell(const char *command);
 
 static char *pref_app_to_run;
 static char *pref_login_shell;
@@ -685,7 +689,25 @@ main(int argc, char **argv, char **envp)
         pref_app_to_run = command_from_prefs("app_to_run", DEFAULT_CLIENT);
         assert(pref_app_to_run);
 
-        pref_login_shell = command_from_prefs("login_shell", DEFAULT_SHELL);
+        pref_login_shell = getenv("SHELL");
+
+        if (! pref_login_shell){
+            pref_login_shell = command_from_prefs("login_shell", DEFAULT_SHELL);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                    free(pref_login_shell);
+                });
+        }
+
+        if(! pref_login_shell){
+            struct passwd *pw = malloc(sizeof(struct passwd));
+            char *buffer = malloc(sizeof(char) * 1024);
+            getpwuid_r(getuid(), pw, buffer, sizeof(buffer), &pw);
+    
+            if (pw != NULL && pw->pw_shell != NULL) {
+                pref_login_shell = pw->pw_shell;
+            }
+        }
+
         assert(pref_login_shell);
 
         pref_startx_script = command_from_prefs("startx_script",
@@ -729,7 +751,7 @@ main(int argc, char **argv, char **envp)
         }
 
         free(pref_app_to_run);
-        free(pref_login_shell);
+        //free(pref_login_shell);
         free(pref_startx_script);
     }
 
@@ -754,18 +776,20 @@ execute(const char *command)
     return 1;
 }
 
+extern char **environ;
+
 static int
 runWithShell(const char *command)
 {
-    const char *newargv[4];
+    const char *newargv[6];
     const char **p;
     pid_t pid;
     int status;
 
-    newargv[0] = pref_login_shell;
-    newargv[1] = "-c";
-    newargv[2] = command;
-    newargv[3] = NULL;
+	newargv[0] = pref_login_shell;
+	newargv[1] = "-c";
+	newargv[2] = command;
+	newargv[3] = NULL;
 
     ErrorF("X11.app: Launching %s:\n", command);
     for (p = newargv; *p; p++) {
@@ -809,10 +833,11 @@ command_from_prefs(const char *key, const char *default_value)
 
         if (!cfDefaultValue)
             goto command_from_prefs_out;
-
+#if 0
         CFPreferencesSetAppValue(cfKey, cfDefaultValue,
                                  kCFPreferencesCurrentApplication);
         CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+#endif
         CFRelease(cfDefaultValue);
 
         command = (char *)malloc(len * sizeof(char));

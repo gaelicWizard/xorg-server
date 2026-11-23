@@ -786,10 +786,12 @@ runWithShell(const char *command)
     pid_t pid;
     int status;
 
-	newargv[0] = pref_login_shell;
-	newargv[1] = "-c";
-	newargv[2] = command;
-	newargv[3] = NULL;
+    newargv[0] = "/usr/bin/login";
+    newargv[1] = "-pfq";
+    newargv[2] = pref_login_shell;
+    newargv[3] = "-c";
+    newargv[4] = command;
+    newargv[5] = NULL;
 
     ErrorF("X11.app: Launching %s:\n", command);
     for (p = newargv; *p; p++) {

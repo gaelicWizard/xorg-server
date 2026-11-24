@@ -60,6 +60,7 @@ x11_bin = executable('X11',
       'bundle-main.c',
       mach_startup[1], # mach_startupServer.c
       mach_startup[3], # mach_startupUser.c
+	  'opposable.c',
      ],
      link_with: x11_bin_libs,
      dependencies: [xproto_dep, x11_bin_deps, mach_startup_dep],

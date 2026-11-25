@@ -46,7 +46,7 @@
 #undef BOOL
 #endif
 
-@interface X11Controller : NSObject <NSTableViewDataSource>
+@interface X11Controller : NSObject <NSTableViewDataSource,NSApplicationDelegate>
 @property (nonatomic, readwrite, strong) IBOutlet NSPanel *prefs_panel;
 
 @property (nonatomic, readwrite, strong) IBOutlet NSButton *fake_buttons;

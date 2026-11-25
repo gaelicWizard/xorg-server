@@ -632,6 +632,9 @@ x11_front_window_id(void)
                        AppleWMCopyToPasteboard);
 }
 
+/* By directly referencing X11Controller from X11Application, we avoid ensure the compiler doesn't think X11Controller is dead code. */
+@dynamic delegate; 
+
 @end
 
 void

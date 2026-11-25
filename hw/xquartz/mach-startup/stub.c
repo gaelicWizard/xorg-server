@@ -178,6 +178,46 @@ signal_handler(int sig)
     _exit(0);
 }
 
+/* check for -displayfd argument, and answer it if supplied */
+void
+report_display_fd(int argc, char *argv[], int launch_display_sock)
+{
+    if(argc >= 2){
+        for( int i = 0; i < argc; i++){
+            if(argv[i] && argv[i] != '\0' && (strcmp(argv[i],"-displayfd") == 0)){
+                /* We've been asked to report the correct display number to xinit */
+                int fd_from_xinit = atoi(argv[++i]);
+                struct sockaddr_un addr = {0};
+                socklen_t len = sizeof(addr);
+                
+                if(launch_display_sock >=0 && (getsockname(launch_display_sock, (struct sockaddr *)&addr, &len) == 0)){
+                    char* socket_path = addr.sun_path;
+                    socket_path[sizeof(addr.sun_path) - 1] = '\0';
+                    if(len > 0){ /* print it and close the fd. */
+                        if(write(fd_from_xinit, socket_path, len) <=0){
+                            asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: couldn't write socket path to -displayfd %d: %d", fd_from_xinit, (int)launch_display_sock);
+                        } else {
+                            asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: wrote socket path to -displayfd %d (%d): %s", fd_from_xinit, launch_display_sock, socket_path);
+                        }
+                    } else {
+                        asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: couldn't get the path to the socket (%d)", (int)launch_display_sock);
+                    }
+                } else {
+                    /* We didn't get the socket from launchd, or didn't get the path from getsockname() */
+                    asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: didn't get socket from launchd and/or getsockname: %d", (int)launch_display_sock);
+
+                /* TODO: FIXME: add a thing to ask X11.app for it's display number once it creates /tmp/.X11-unix/X$ socket */
+                }
+                close(fd_from_xinit);
+            } else {
+                asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: %s;", argv[i]);
+            }
+        }
+    } else {
+        asl_log(aslc, NULL, ASL_LEVEL_ERR, "Xquartz: we didn't get any arguments (%d)", (int)launch_display_sock);
+    }
+}
+
 int
 main(int argc, char **argv, char **envp)
 {
@@ -187,7 +227,7 @@ main(int argc, char **argv, char **envp)
     string_array_t newenvp;
     string_array_t newargv;
     size_t i;
-    int launchd_fd;
+    int launchd_fd = -1;
     string_t handoff_socket_filename;
     sig_t handler;
     char *asl_sender;
@@ -215,6 +255,9 @@ main(int argc, char **argv, char **envp)
 
     /* Get the $DISPLAY FD */
     launchd_fd = launchd_display_fd();
+    
+    /* handle -displayfd */
+    report_display_fd(argc, argv, launchd_fd);
 
     kr = bootstrap_look_up(bootstrap_port, server_bootstrap_name, &mp);
     if (kr != KERN_SUCCESS) {

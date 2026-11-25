@@ -791,6 +791,11 @@ ddxProcessArgument(int argc, char *argv[], int i)
         ErrorF("Attempting to use pixel depth of %i\n", darwinDesiredDepth);
         return 2;
     }
+    
+    if(!strcmp(argv[i], "-displayfd")) {
+        /* handled by Xquartz stub */
+        return 2;
+    }
 
     if (!strcmp(argv[i], "-showconfig") || !strcmp(argv[i], "-version")) {
         DarwinPrintBanner();

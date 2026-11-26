@@ -42,8 +42,8 @@
 @property (nonatomic, readwrite, strong) X11Controller *controller;
 @property (nonatomic, readonly, assign) OSX_BOOL x_active;
 
-/* By directly referencing X11Controller from X11Application, we avoid ensure the compiler doesn't think X11Controller is dead code. */
 @property (nullable, weak) X11Controller<NSApplicationDelegate> *delegate;
+@property (nullable, strong) IBOutlet NSMenu *mainMenu;
 
 @end
 

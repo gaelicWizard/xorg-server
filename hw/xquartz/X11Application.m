@@ -169,6 +169,9 @@ struct message_struct {
     NSObject *arg;
 };
 
+@dynamic delegate; 
+@dynamic mainMenu;
+
 /* Quartz mode initialization routine. This is often dynamically loaded
    but is statically linked into this X server. */
 Bool
@@ -632,9 +635,6 @@ x11_front_window_id(void)
                        AppleWMCopyToPasteboard);
 }
 
-/* By directly referencing X11Controller from X11Application, we avoid ensure the compiler doesn't think X11Controller is dead code. */
-@dynamic delegate; 
-
 @end
 
 void
@@ -841,7 +841,8 @@ X11ApplicationMain(int argc, char **argv, char **envp)
         X11App = (X11Application *)[X11Application sharedApplication];
         [X11App read_defaults];
 
-        [NSBundle loadNibNamed:@"main" owner:X11App];
+        X11App.controller = [[X11Controller alloc] init];
+        [NSBundle loadNibNamed:@"main" owner:X11App.controller];
         [NSNotificationCenter.defaultCenter addObserver:X11App
                                                selector:@selector (became_key:)
                                                    name:NSWindowDidBecomeKeyNotification

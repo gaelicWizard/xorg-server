@@ -120,7 +120,6 @@ QuartzInitServer(int argc, char **argv, char **envp)
 int
 server_main(int argc, char **argv, char **envp)
 {
-    int i;
     int fd[2];
 
     /* Unset CFProcessPath, so our children don't inherit this kludge we need
@@ -134,15 +133,6 @@ server_main(int argc, char **argv, char **envp)
     darwinEventReadFD = fd[0];
     darwinEventWriteFD = fd[1];
     fcntl(darwinEventReadFD, F_SETFL, O_NONBLOCK);
-
-    for (i = 1; i < argc; i++) {
-        // Display version info without starting Mac OS X UI if requested
-        if (!strcmp(argv[i],
-                    "-showconfig") || !strcmp(argv[i], "-version")) {
-            DarwinPrintBanner();
-            exit(0);
-        }
-    }
 
     return X11ApplicationMain(argc, argv, envp);
 }

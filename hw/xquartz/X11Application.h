@@ -72,7 +72,7 @@ X11ApplicationCanEnterRandR(void);
 
 //_X_NORETURN
 int
-X11ApplicationMain(int argc, char **argv, char **envp);
+X11ApplicationMain(int argc, char **argv, char **envp) NS_NO_RETURN;
 
 extern Bool XQuartzScrollInDeviceDirection;
 

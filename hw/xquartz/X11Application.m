@@ -841,12 +841,12 @@ X11ApplicationMain(int argc, char **argv, char **envp)
         X11App = (X11Application *)[X11Application sharedApplication];
         [X11App read_defaults];
 
-        [NSBundle loadNibNamed:@"main" owner:NSApp];
-        [NSNotificationCenter.defaultCenter addObserver:NSApp
+        [NSBundle loadNibNamed:@"main" owner:X11App];
+        [NSNotificationCenter.defaultCenter addObserver:X11App
                                                selector:@selector (became_key:)
                                                    name:NSWindowDidBecomeKeyNotification
                                                  object:nil];
-        [NSNotificationCenter.defaultCenter addObserver:NSApp
+        [NSNotificationCenter.defaultCenter addObserver:X11App
                                                selector:@selector (screen_params_changed:)
                                                    name:NSApplicationDidChangeScreenParametersNotification
                                                  object:nil];

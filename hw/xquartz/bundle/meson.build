@@ -24,13 +24,16 @@ foreach lang : localities
         install_dir: bundle_root / 'Contents/Resources' / lang + '.lproj',
         install_mode: 'rw-r--r--')
 
-    install_data('Resources' / lang + '.lproj' / 'main.nib/keyedobjects.nib',
-        install_dir: bundle_root / 'Contents/Resources' / lang + '.lproj' / 'main.nib',
+    install_data('Resources' / lang + '.lproj' / 'main.strings',
+        install_dir: bundle_root / 'Contents/Resources' / lang + '.lproj',
         install_mode: 'rw-r--r--')
 endforeach
 
-install_data('Resources/English.lproj/main.nib/designable.nib',
-    install_dir: bundle_root / 'Contents/Resources/English.lproj/main.nib',
+install_data('Resources/Base.lproj/main.nib/designable.nib',
+    install_dir: bundle_root / 'Contents/Resources/Base.lproj/main.nib',
+    install_mode: 'rw-r--r--')
+install_data('Resources/Base.lproj/main.nib/keyedobjects.nib',
+    install_dir: bundle_root / 'Contents/Resources/Base.lproj/main.nib',
     install_mode: 'rw-r--r--')
 
 install_data('Resources/X11.icns',

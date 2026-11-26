@@ -74,11 +74,6 @@ extern char *bundle_id_prefix;
 
 - (void) awakeFromNib
 {
-    X11Application *xapp = NSApp;
-
-    /* Point X11Application at ourself. */
-    xapp.controller = self;
-
     NSUserDefaults * const defaults = NSUserDefaults.xquartzDefaults;
     NSArray *appsMenu = [defaults arrayForKey:XQuartzPrefKeyAppsMenu];
 
@@ -915,10 +910,3 @@ extern char *bundle_id_prefix;
 }
 
 @end
-
-//_X_NORETURN
-int
-X11ControllerMain(int argc, char **argv, char **envp)
-{
-    return X11ApplicationMain(argc, argv, envp); // no return
-}

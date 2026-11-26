@@ -843,11 +843,11 @@ X11ApplicationMain(int argc, char **argv, char **envp)
 
         X11App.controller = [[X11Controller alloc] init];
         [NSBundle loadNibNamed:@"main" owner:X11App.controller];
-        [NSNotificationCenter.defaultCenter addObserver:X11App
+        [NSNotificationCenter.defaultCenter addObserver:NSApp
                                                selector:@selector (became_key:)
                                                    name:NSWindowDidBecomeKeyNotification
                                                  object:nil];
-        [NSNotificationCenter.defaultCenter addObserver:X11App
+        [NSNotificationCenter.defaultCenter addObserver:NSApp
                                                selector:@selector (screen_params_changed:)
                                                    name:NSApplicationDidChangeScreenParametersNotification
                                                  object:nil];
